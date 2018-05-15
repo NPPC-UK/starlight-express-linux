@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <getopt.h>
 
 #include "hidapi/hidapi.h"
 
 #include "comms.h"
 #include "filterwheel.h"
-
 
 int main(int argc, char* argv[]) {
   unsigned char response;
@@ -29,7 +28,10 @@ int main(int argc, char* argv[]) {
     change_filter(opts.filter, dev);  
   }
 
+
   hid_close(dev);
+
+  hid_exit();
 
   return 0;
 }
@@ -38,25 +40,37 @@ int main(int argc, char* argv[]) {
 struct filter_options parse_options(int argc, char* argv[]) {
   struct filter_options opts = {CHANGE_FILTER, 0};
   char c;
-  while ((c = getopt(argc, argv, "g")) != -1 ) {
+  int opt_index = 0;
+
+  static struct option long_options[] = {
+    {"get", 0, NULL, 'g'},
+    {"help", 0, NULL, 'h'},
+  };
+
+  while ((c = getopt_long(argc, argv, "gh", long_options, &opt_index)) != -1 ) {
     switch (c) {
       case 'g':
         opts.op = GET_FILTER;
         break;
+      case 'h':
+        print_help_and_exit(0);
+      case '?':
+        printf("Unknown option: %d \n", c);
+        print_help_and_exit(1);
       default:
-        printf("Unknown option: %o \n", c);
+        break;
     }
   }
 
   if (opts.op == CHANGE_FILTER) {
     if (argc != 2) {
       printf("Incorrect number of arguments!");
-      exit(1);
+      print_help_and_exit(1);
     }
     opts.filter = atoi(argv[argc -1]);
     if (opts.filter == 0) {
       printf("Filter number must be a natural number.");
-      exit(1);
+      print_help_and_exit(1);
     }
   } 
   return opts;
