@@ -62,8 +62,10 @@ struct filter_options parse_options(int argc, char* argv[]) {
   return opts;
 }
 
-
-
-
-
-
+void print_help_and_exit(char exit_status) {
+  printf("usage: filterwheel [-g] [-h] [filter_number]\n");
+  printf("\tfilter_number:  The number of the filter that you want to use\n");
+  printf("\t-g, --get:      Get the current filter\n");
+  printf("\t-h, --help:     Print this help message\n");
+  exit(exit_status);
+}

@@ -11,4 +11,6 @@ struct filter_options {
 
 struct filter_options parse_options(int argc, char* argv[]);
 
+void print_help_and_exit(char exit_status);
+
 #endif
